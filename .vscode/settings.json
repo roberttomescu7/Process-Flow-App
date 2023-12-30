@@ -2,7 +2,8 @@
     "files.associations": {
         "xstring": "cpp",
         "iostream": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iosfwd": "cpp"
     },
     "todo-tree.highlights.defaultHighlight": {
         "icon": "alert",

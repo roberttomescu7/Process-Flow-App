@@ -10,15 +10,16 @@ TitleStep::TitleStep()
     this->setSubtitle();
 }
 
-void TitleStep::display()
+void TitleStep::run(ostream& output)
 {
-    cout<<this->getTitle()<<"\n\n";
-    cout<<this->getSubtitle()<<"\n\n";
+    
+    output<<this->getTitle()<<"\n\n";
+    output<<this->getSubtitle()<<"\n\n";
 }
 
 void TitleStep::setTitle()
 {
-    cin>>this->title;
+    getline(cin, this->title);
 }
 
 string TitleStep::getTitle()
@@ -28,7 +29,7 @@ string TitleStep::getTitle()
 
 void TitleStep::setSubtitle()
 {
-    cin>>this->subtitle;
+    getline(cin, this->subtitle);
 }
 
 string TitleStep::getSubtitle()
@@ -46,7 +47,7 @@ TextStep::TextStep()
     this->setCopy();
 }
 
-void TextStep::display()
+void TextStep::run(ostream& output)
 {
     cout<<this->getTitle()<<"\n\n";
     cout<<this->getCopy()<<"\n\n";
@@ -54,7 +55,7 @@ void TextStep::display()
 
 void TextStep::setTitle()
 {
-    cin>>this->title;
+    getline(cin, this->title);
 }
 
 string TextStep::getTitle()
@@ -64,7 +65,7 @@ string TextStep::getTitle()
 
 void TextStep::setCopy()
 {
-    cin>>this->copy;
+    getline(cin, this->copy);
 }
 
 string TextStep::getCopy()
@@ -80,7 +81,7 @@ TextInputStep::TextInputStep()
     this->setDescription();
 }
 
-void TextInputStep::display()
+void TextInputStep::run(ostream& output)
 {
     cout<<this->getDescription()<<"\n\n";
     cout<<"Text: ";
@@ -90,7 +91,7 @@ void TextInputStep::display()
 
 void TextInputStep::setDescription()
 {
-    cin>>this->description;
+    getline(cin, this->description);
 }
 
 string TextInputStep::getDescription()
@@ -100,7 +101,7 @@ string TextInputStep::getDescription()
 
 void TextInputStep::setText()
 {
-    cin>>this->text;
+    getline(cin, this->text);
 }
 
 string TextInputStep::getText()
@@ -116,12 +117,17 @@ NumberInputStep::NumberInputStep()
     this->setDescription();
 }
 
-void NumberInputStep::display()
+void NumberInputStep::run(ostream& output)
 {
     cout<<this->description<<"\n\n";
     cout<<"Number: ";
     this->setNumber();
     cout<<"\n\n";
+}
+
+void NumberInputStep::setDescription()
+{
+    getline(cin, this->description);
 }
 
 string NumberInputStep::getDescription()
@@ -141,7 +147,7 @@ int NumberInputStep::getNumber()
 
 //  CALCULUS STEP
 
-CalculusStep::CalculusStep()
+CalculusStep::CalculusStep(vector<Step*>* containingFlow)
 {
     cout<<"First step: ";
     this->setStep1();
@@ -149,9 +155,10 @@ CalculusStep::CalculusStep()
     this->setStep2();
     cout<<"Operation: ";
     this->setOpearation();
+    this->setContainingFlow(containingFlow);
 }
 
-void CalculusStep::display()
+void CalculusStep::run(ostream& output)
 {  
     cout<<"Result of step "<<this->step1<<" "
         <<this->operation<<" step "<<this->step2<<": ";
@@ -166,19 +173,19 @@ void CalculusStep::setStep1()
     cin>>this->step1;
 }
 
-Step *CalculusStep::getStep1(vector<Step*> flow)
-{
-    //  TODO: Implement after the class FLOW has been created
-}
-
 void CalculusStep::setStep2()
 {
     cin>>this->step2;
 }
 
-Step *CalculusStep::getStep2(vector<Step*> flow)
+void CalculusStep::setContainingFlow(vector<Step*>* _containingFlow)
 {
-    //  TODO: Implement after the class FLOW has been created
+    this->containingFlow = _containingFlow;
+}
+
+Step* CalculusStep::getStep(int stepNumber)
+{
+    return this->containingFlow->at(stepNumber);
 }
 
 void CalculusStep::setOpearation()
@@ -188,35 +195,76 @@ void CalculusStep::setOpearation()
 
 void CalculusStep::calculate()
 {
-    //  TODO: Implement after the class FLOW has been created
+    NumberInputStep* s1 = dynamic_cast<NumberInputStep*>(this->getStep(this->step1));
+    NumberInputStep* s2 = dynamic_cast<NumberInputStep*>(this->getStep(this->step2));
+
+    if (this->operation == "+") {
+        this->result = s1->getNumber() + s2->getNumber();
+    }
+    else if (this->operation == "-") {
+        this->result = s1->getNumber() - s2->getNumber();
+    }
+    else if (this->operation == "*") {
+        this->result = s1->getNumber() * s2->getNumber();
+    }
+    else if (this->operation == "/") {
+        this->result = s1->getNumber() / s2->getNumber();
+    }
+    else if (this->operation == "min") {
+        this->result = min(s1->getNumber(), s2->getNumber());
+    }
+    else if (this->operation == "max") {
+        this->result = max(s1->getNumber(), s2->getNumber());
+    }
+    else {
+        cout<<"ERROR";
+    }
 }
 
 //  DISPLAY STEP
 
-DisplayStep::DisplayStep()
+DisplayStep::DisplayStep(vector<Step*>* containingFlow)
 {
-    cout<<"Step to display: ";
+    cout<<"Step to:run:istream& output ";
     this->setStep();
+    this->setContainingFlow(containingFlow);
 }
 
-void DisplayStep::display()
+void DisplayStep::run(ostream& output)
 {
-    //  TODO: Implement after the class FLOW has been created
+    //  FIXME: The:run istream& outputmethod depends on the file format
+    this->setPath();
+
+    ifstream fin(this->getPath(), ios::in);
+    string line;
+    while (getline(fin, line)) {
+        cout<<line<<"\n";
+    }
+
+    fin.close();
 }
 
 void DisplayStep::setStep()
 {
     cin>>this->step;
+    getchar();
 }
 
-Step DisplayStep::*getStep(vector<Step*> flow)
+void DisplayStep::setContainingFlow(vector<Step*>* _containingFlow)
 {
-    //  TODO: Implement after the class FLOW has been created
+    this->containingFlow = _containingFlow;
 }
 
-void DisplayStep::setPath(string _path)
+Step* DisplayStep::getStep()
 {
-    this->path = _path;
+    return this->containingFlow->at(this->step);
+}
+
+void DisplayStep::setPath()
+{   
+    //  FIXME: Only works for TextFileStep. It must also works for CsvFIleStep
+    TextFileStep* s1 = dynamic_cast<TextFileStep*>(this->getStep());
+    this->path = "../files/" + s1->getFileName();
 }
 
 string DisplayStep::getPath()
@@ -232,7 +280,7 @@ TextFileStep::TextFileStep()
     this->setDescription();
 }
 
-void TextFileStep::display()
+void TextFileStep::run(ostream& output)
 {
     cout<<this->getDescription()<<"\n\n";
     cout<<"File name: ";
@@ -241,7 +289,7 @@ void TextFileStep::display()
 
 void TextFileStep::setDescription()
 {
-    cin>>this->description;
+    getline(cin, this->description);
 }
 
 string TextFileStep::getDescription()
@@ -251,7 +299,7 @@ string TextFileStep::getDescription()
 
 void TextFileStep::setFileName()
 {
-    cin>>this->fileName;
+    getline(cin, this->fileName);
 }
 
 string TextFileStep::getFileName()
@@ -267,7 +315,7 @@ CsvFileStep::CsvFileStep()
     this->setDescription();
 }
 
-void CsvFileStep::display()
+void CsvFileStep::run(ostream& output)
 {
     cout<<this->getDescription()<<"\n\n";
     cout<<"File name: ";
@@ -276,7 +324,7 @@ void CsvFileStep::display()
 
 void CsvFileStep::setDescription()
 {
-    cin>>this->description;
+    getline(cin, this->description);
 }
 
 string CsvFileStep::getDescription()
@@ -286,7 +334,7 @@ string CsvFileStep::getDescription()
 
 void CsvFileStep::setFileName()
 {
-    cin>>this->fileName;
+    getline(cin, this->fileName);
 }
 
 string CsvFileStep::getFileName()
@@ -296,7 +344,7 @@ string CsvFileStep::getFileName()
 
 //  OUTPUT STEP
 
-OutputStep::OutputStep()
+OutputStep::OutputStep(vector<Step*>* containingFlow)
 {
     cout<<"File name: ";
     this->setFileName();
@@ -306,10 +354,22 @@ OutputStep::OutputStep()
     this->setDescription(); 
     cout<<"Step: ";
     this->setStep();
+    this->setContainingFlow(containingFlow);
 }
 
-void OutputStep::display()
+void OutputStep::run(ostream& output)
 {   
+    ofstream fout(this->getFileName(), ios::out);
+
+    Step* step = this->getStep();
+
+    fout<<this->getTitle()<<"\n\n";
+    fout<<this->getDescription()<<"\n\n";
+
+    fout<<"==========   STEP "<<this->step<<" OUTPUT    ==========\n\n";
+
+    step->run(fout);
+
     cout<<"The output file with the name "
         <<this->getFileName()<<" was created\n\n";
 }
@@ -317,26 +377,32 @@ void OutputStep::display()
 void OutputStep::setStep()
 {
     cin>>this->step;
+    getchar();
 }
 
-Step *OutputStep::getStep(vector<Step*> flow)
+void OutputStep::setContainingFlow(vector<Step*>* _containingFlow)
 {
-    //  TODO: Implement after the class FLOW has been created
+    this->containingFlow = _containingFlow;
+}
+
+Step *OutputStep::getStep()
+{
+    return this->containingFlow->at(this->step);
 }
 
 void OutputStep::setFileName()
 {
-    cin>>this->fileName;
+    getline(cin, this->fileName);
 }
 
 string OutputStep::getFileName()
 {
-    return this->fileName;
+    return "../files/" + this->fileName;
 }
 
 void OutputStep::setTitle()
 {
-    cin>>this->title;
+    getline(cin, this->title);
 }
 
 string OutputStep::getTitle()
@@ -346,7 +412,7 @@ string OutputStep::getTitle()
 
 void OutputStep::setDescription()
 {
-    cin>>this->description;
+    getline(cin, this->description);
 }
 
 string OutputStep::getDescription()
@@ -356,7 +422,7 @@ string OutputStep::getDescription()
 
 //  END STEP
 
-void EndStep::display()
+void EndStep::run(ostream& output)
 {
     cout<<"End\n\n";
 }
@@ -383,14 +449,14 @@ Step* StepFactory::createNumberInputStep()
     return new NumberInputStep;
 }
 
-Step* StepFactory::createCalculusStep()
+Step* StepFactory::createCalculusStep(vector<Step*>* containingFlow)
 {
-    return new CalculusStep;
+    return new CalculusStep(containingFlow);
 }
 
-Step* StepFactory::createDisplayStep()
+Step* StepFactory::createDisplayStep(vector<Step*>* containingFlow)
 {
-    return new DisplayStep;
+    return new DisplayStep(containingFlow);
 }
 
 Step* StepFactory::createTextFileStep()
@@ -403,9 +469,9 @@ Step* StepFactory::createCsvFileStep()
     return new CsvFileStep;
 }
 
-Step* StepFactory::createOutputStep()
+Step* StepFactory::createOutputStep(vector<Step*>* containingFlow)
 {
-    return new OutputStep;
+    return new OutputStep(containingFlow);
 }
 
 Step* StepFactory::createEndStep()

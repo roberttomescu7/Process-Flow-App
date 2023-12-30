@@ -1,4 +1,8 @@
+#ifndef STEPFACTORY_HPP
+#define STEPFACTORY_HPP
+
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -7,7 +11,7 @@ using namespace std;
 class Step
 {
     public:
-        virtual void display() = 0;
+        virtual void run(ostream& output) = 0;
 };
 
 class TitleStep : public Step
@@ -18,7 +22,7 @@ class TitleStep : public Step
 
     public: 
         TitleStep();
-        void display() override;
+        void run(ostream& output) override;
         void setTitle();
         string getTitle();
         void setSubtitle();
@@ -33,7 +37,7 @@ class TextStep : public Step
     
     public:
         TextStep();
-        void display() override;
+        void run(ostream& output) override;
         void setTitle();
         string getTitle();
         void setCopy();
@@ -48,7 +52,7 @@ class TextInputStep : public Step
     
     public:
         TextInputStep();
-        void display() override;
+        void run(ostream& output) override;
         void setDescription();
         string getDescription();
         void setText();
@@ -63,7 +67,7 @@ class NumberInputStep : public Step
     
     public:
         NumberInputStep();
-        void display() override;
+        void run(ostream& output) override;
         void setDescription();
         string getDescription();
         void setNumber();
@@ -78,16 +82,16 @@ class CalculusStep : public Step
         int step2;
         int result;
         string operation;
-        vector<Step*> *container;
+        vector<Step*>* containingFlow;
     
     public:
-        CalculusStep();
-        void display() override;
+        CalculusStep(vector<Step*>* containingFlow);
+        void run(ostream& output) override;
         void setStep1();
-        Step* getStep1(vector<Step*> flow);
         void setStep2();
-        Step* getStep2(vector<Step*> flow);
+        void setContainingFlow(vector<Step*>* container); 
         void setOpearation();
+        Step* getStep(int stepNumber);
         void calculate();
         //  TODO: Handle exceptions
 };
@@ -97,13 +101,15 @@ class DisplayStep : public Step
     private:
         string path;
         int step;
+        vector<Step*>* containingFlow;
     
     public:
-        DisplayStep();
-        void display() override;
+        DisplayStep(vector<Step*>* containingFlow);
+        void run(ostream& output) override;
         void setStep();
-        Step* getStep(vector<Step*> flow);
-        void setPath(string _path);
+        void setContainingFlow(vector<Step*>* container);
+        Step* getStep();
+        void setPath();
         string getPath();
         //  TODO: Handle exceptions
 };
@@ -116,7 +122,7 @@ class TextFileStep : public Step
 
     public:
         TextFileStep();
-        void display() override;
+        void run(ostream& output) override;
         void setDescription();
         string getDescription();
         void setFileName();
@@ -132,7 +138,7 @@ class CsvFileStep : public Step
 
     public:
         CsvFileStep();
-        void display() override;
+        void run(ostream& output) override;
         void setDescription();
         string getDescription();
         void setFileName();
@@ -147,12 +153,14 @@ class OutputStep : public Step
         string fileName;
         string title;
         string description;
+        vector<Step*>* containingFlow;
 
     public:
-        OutputStep();
-        void display() override;
+        OutputStep(vector<Step*>* containingFlow);
+        void run(ostream& output) override;
         void setStep();
-        Step* getStep(vector<Step*> flow);
+        void setContainingFlow(vector<Step*>* container);
+        Step* getStep();
         void setFileName();
         string getFileName();
         void setTitle();
@@ -164,7 +172,7 @@ class OutputStep : public Step
 class EndStep : public Step
 {
     public:
-        void display() override;
+        void run(ostream& output) override;
         // NOTE: More complex functionality can be added later
 };
 
@@ -176,14 +184,14 @@ class StepFactory
         Step* createTextStep();
         Step* createTextInputStep();
         Step* createNumberInputStep();
-        Step* createCalculusStep();
-        Step* createDisplayStep();
+        Step* createCalculusStep(vector<Step*>* containingFlow);
+        Step* createDisplayStep(vector<Step*>* containingFlow);
         Step* createTextFileStep();
         Step* createCsvFileStep();
-        Step* createOutputStep();
+        Step* createOutputStep(vector<Step*>* containingFlow);
         Step* createEndStep();
 };
 
-
+#endif
 
 
