@@ -225,23 +225,28 @@ void CalculusStep::calculate()
 
 DisplayStep::DisplayStep(vector<Step*>* containingFlow)
 {
-    cout<<"Step to:run:istream& output ";
+    cout<<"Step to display: ";
     this->setStep();
     this->setContainingFlow(containingFlow);
 }
 
 void DisplayStep::run(ostream& output)
 {
-    //  FIXME: The:run istream& outputmethod depends on the file format
-    this->setPath();
+    Step* s1 = this->getStep();
 
-    ifstream fin(this->getPath(), ios::in);
-    string line;
-    while (getline(fin, line)) {
-        cout<<line<<"\n";
+    TextFileStep* textStep = dynamic_cast<TextFileStep*>(s1);
+    CsvFileStep* csvStep = dynamic_cast<CsvFileStep*>(s1);
+
+    string path;
+    
+    if (textStep) {
+        path = "../files/" + textStep->getFileName();
+    }
+    else if (csvStep) {
+        path = "../files/" + csvStep->getFileName();
     }
 
-    fin.close();
+    FileManager::readAndPrint(path, output);
 }
 
 void DisplayStep::setStep()
@@ -258,18 +263,6 @@ void DisplayStep::setContainingFlow(vector<Step*>* _containingFlow)
 Step* DisplayStep::getStep()
 {
     return this->containingFlow->at(this->step);
-}
-
-void DisplayStep::setPath()
-{   
-    //  FIXME: Only works for TextFileStep. It must also works for CsvFIleStep
-    TextFileStep* s1 = dynamic_cast<TextFileStep*>(this->getStep());
-    this->path = "../files/" + s1->getFileName();
-}
-
-string DisplayStep::getPath()
-{
-    return this->path;
 }
 
 //  TEXT FILE STEP

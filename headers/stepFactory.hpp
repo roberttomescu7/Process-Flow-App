@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "fileManager.hpp"
 
 using namespace std;
 
@@ -12,6 +13,10 @@ class Step
 {
     public:
         virtual void run(ostream& output) = 0;
+        void skip()
+        {
+            cout<<"Step skiped!";
+        }
 };
 
 class TitleStep : public Step
@@ -99,7 +104,6 @@ class CalculusStep : public Step
 class DisplayStep : public Step
 {
     private:
-        string path;
         int step;
         vector<Step*>* containingFlow;
     
@@ -109,8 +113,6 @@ class DisplayStep : public Step
         void setStep();
         void setContainingFlow(vector<Step*>* container);
         Step* getStep();
-        void setPath();
-        string getPath();
         //  TODO: Handle exceptions
 };
 

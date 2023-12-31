@@ -9,9 +9,10 @@ int main()
 
     Step* step1 = factory.createTitleStep();
     flow1.addStep(step1);
-    Step* step2 = factory.createOutputStep(flow1.getSteps());
-    flow1.addStep(step2);   
-
+    Step* step2 = factory.createTextFileStep();
+    flow1.addStep(step2);
+    Step* step3 = factory.createDisplayStep(flow1.getSteps());
+    flow1.addStep(step3);
 
     cout<<"=========================\n";
 
