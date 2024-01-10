@@ -1,16 +1,22 @@
-#ifndef STEPFACTORY_HPP
-#define STEPFACTORY_HPP
+#ifndef STEP_FACTORY_HPP
+#define STEP_FACTORY_HPP
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
+#include <functional>
+#include <stdlib.h>
 #include "fileManager.hpp"
 
 using namespace std;
 
 class Step
 {
+    protected:
+        bool state = true;
+
     public:
         virtual void run(ostream& output) = 0;
         void skip()
@@ -68,7 +74,7 @@ class NumberInputStep : public Step
 {
     private:
         string description;
-        int number;
+        float number;
     
     public:
         NumberInputStep();
@@ -76,16 +82,15 @@ class NumberInputStep : public Step
         void setDescription();
         string getDescription();
         void setNumber();
-        int getNumber();
-        //  TODO: Handle exceptions
+        float getNumber();
 };
 
 class CalculusStep : public Step
 {
     private:
-        int step1;
-        int step2;
-        int result;
+        NumberInputStep* step1;
+        NumberInputStep* step2;
+        float result;
         string operation;
         vector<Step*>* containingFlow;
     
@@ -96,15 +101,14 @@ class CalculusStep : public Step
         void setStep2();
         void setContainingFlow(vector<Step*>* container); 
         void setOpearation();
-        Step* getStep(int stepNumber);
+        Step* getStep(int stepIndex);
         void calculate();
-        //  TODO: Handle exceptions
 };
 
 class DisplayStep : public Step
 {
     private:
-        int step;
+        Step* step;
         vector<Step*>* containingFlow;
     
     public:
@@ -112,8 +116,7 @@ class DisplayStep : public Step
         void run(ostream& output) override;
         void setStep();
         void setContainingFlow(vector<Step*>* container);
-        Step* getStep();
-        //  TODO: Handle exceptions
+        Step* getStep(int stepIdx);
 };
 
 class TextFileStep : public Step
@@ -129,7 +132,6 @@ class TextFileStep : public Step
         string getDescription();
         void setFileName();
         string getFileName();
-        //  TODO: Handle exceptions
 };
 
 class CsvFileStep : public Step
@@ -145,13 +147,12 @@ class CsvFileStep : public Step
         string getDescription();
         void setFileName();
         string getFileName();
-        //  TODO: Handle exceptions
 };
 
 class OutputStep : public Step
 {
     private:
-        int step;
+        Step* step;
         string fileName;
         string title;
         string description;
@@ -162,7 +163,7 @@ class OutputStep : public Step
         void run(ostream& output) override;
         void setStep();
         void setContainingFlow(vector<Step*>* container);
-        Step* getStep();
+        Step* getStep(int stepIndex);
         void setFileName();
         string getFileName();
         void setTitle();
@@ -193,6 +194,47 @@ class StepFactory
         Step* createOutputStep(vector<Step*>* containingFlow);
         Step* createEndStep();
 };
+
+template <typename T>
+T add(T operand1, T operand2) {
+    return operand1 + operand2;
+}
+
+template <typename T>
+T subtract(T operand1, T operand2) {
+    return operand1 - operand2;
+}
+
+template <typename T>
+T multiply(T operand1, T operand2) {
+    return operand1 * operand2;
+}
+
+template <typename T>
+T divide(T operand1, T operand2) {
+    return operand1 / operand2;
+}
+
+template <typename T>
+T minimum(T operand1, T operand2) {
+    return std::min(operand1, operand2);
+}
+
+template <typename T>
+T maximum(T operand1, T operand2) {
+    return std::max(operand1, operand2);
+}
+
+template <typename T>
+map<string, function<T(T, T)>> operationMap = {
+    {"+", add<float>},
+    {"-", subtract<float>},
+    {"*", multiply<float>},
+    {"/", divide<float>},
+    {"min", minimum<float>},
+    {"max", maximum<float>} 
+};
+
 
 #endif
 

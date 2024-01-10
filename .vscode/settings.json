@@ -3,7 +3,9 @@
         "xstring": "cpp",
         "iostream": "cpp",
         "vector": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "xtree": "cpp",
+        "string": "cpp"
     },
     "todo-tree.highlights.defaultHighlight": {
         "icon": "alert",

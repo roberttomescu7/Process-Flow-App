@@ -4,6 +4,10 @@
 
 TitleStep::TitleStep() 
 {
+    // Default initializations
+    this->title = "Unknown";
+    this->subtitle = "Unknown";
+
     cout<<"Title: ";
     this->setTitle();
     cout<<"Subtitle: ";
@@ -12,9 +16,13 @@ TitleStep::TitleStep()
 
 void TitleStep::run(ostream& output)
 {
-    
     output<<this->getTitle()<<"\n\n";
     output<<this->getSubtitle()<<"\n\n";
+
+    cout<<"Press [ENTER] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void TitleStep::setTitle()
@@ -41,6 +49,10 @@ string TitleStep::getSubtitle()
 
 TextStep::TextStep()
 {
+    // Default initializations
+    this->title = "Unknown";
+    this->copy = "Unknown";
+
     cout<<"Title: ";
     this->setTitle();
     cout<<"Copy: ";
@@ -51,6 +63,11 @@ void TextStep::run(ostream& output)
 {
     cout<<this->getTitle()<<"\n\n";
     cout<<this->getCopy()<<"\n\n";
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void TextStep::setTitle()
@@ -77,6 +94,10 @@ string TextStep::getCopy()
 
 TextInputStep::TextInputStep()
 {
+    // Default initializations
+    this->description = "Unknown";
+    this->text = "Unknown";
+
     cout<<"Description: ";
     this->setDescription();
 }
@@ -87,6 +108,11 @@ void TextInputStep::run(ostream& output)
     cout<<"Text: ";
     this->setText();
     cout<<"\n\n";
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void TextInputStep::setDescription()
@@ -113,16 +139,43 @@ string TextInputStep::getText()
 
 NumberInputStep::NumberInputStep()
 {
+    // Default initializations
+    this->number = 0;
+    this->description = "Unknown";
+
     cout<<"Description: ";
     this->setDescription();
+
 }
 
 void NumberInputStep::run(ostream& output)
 {
-    cout<<this->description<<"\n\n";
-    cout<<"Number: ";
-    this->setNumber();
-    cout<<"\n\n";
+    while (this->state) {
+        try {
+            cout<<this->description<<"\n\n";
+            cout<<"Number: ";
+            this->setNumber();
+            cout<<"\n\n";
+            this->state = false;
+        }
+        catch (string error) {
+            cerr<<error<<"\n";
+            cout<<"Do you want to skip this step? [Y/N] ";
+            
+            char answer;
+            cin>>answer;
+            getchar();
+
+            if (answer == 'y' || answer == 'Y') {
+                this->state = false;
+            }
+        }
+    }
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void NumberInputStep::setDescription()
@@ -137,10 +190,14 @@ string NumberInputStep::getDescription()
 
 void NumberInputStep::setNumber()
 {
-    cin>>this->number;
+    string input;
+    getline(cin, input);
+    if (!(istringstream(input) >> this->number)) {
+        throw (string)"Invalid input. You have to introduce a number.";
+    }  
 }
 
-int NumberInputStep::getNumber()
+float NumberInputStep::getNumber()
 {
     return this->number;
 }
@@ -149,33 +206,94 @@ int NumberInputStep::getNumber()
 
 CalculusStep::CalculusStep(vector<Step*>* containingFlow)
 {
-    cout<<"First step: ";
-    this->setStep1();
-    cout<<"Second step: ";
-    this->setStep2();
-    cout<<"Operation: ";
-    this->setOpearation();
+    // Default initializations
     this->setContainingFlow(containingFlow);
+    this->step1 = nullptr;
+    this->step2 = nullptr;
+    this->operation = "Unknown";
+    this->result = 0;
+
+    while (this->state) {
+        try {
+            if (this->step1 == nullptr) {
+                cout<<"First step: ";
+                this->setStep1();
+            }
+            if (this->step2 == nullptr) {
+                cout<<"Second step: ";
+                this->setStep2();
+            }
+            if (this->operation == "Unknown") {
+                cout<<"Operation: ";
+                this->setOpearation();
+            }
+            this->state = false;
+        }
+        catch (string error) {
+            cerr<<error<<"\n";
+            cout<<"Do you want to skip this step? [Y/N] ";
+            
+            char answer;
+            cin>>answer;
+            getchar();
+
+            if (answer == 'y' || answer == 'Y') {
+                this->state = false;
+            }
+        }
+    }
 }
 
 void CalculusStep::run(ostream& output)
-{  
-    cout<<"Result of step "<<this->step1<<" "
-        <<this->operation<<" step "<<this->step2<<": ";
+{
+    cout<<"Result: ";
 
-        this->calculate();
+    this->calculate();
 
-        cout<<this->result<<"\n\n";
+    cout<<this->result<<"\n\n";
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }   
 
 void CalculusStep::setStep1()
 {
-    cin>>this->step1;
+    string input;
+    int stepIndex;
+    getline(cin, input);
+
+    istringstream stringStream(input); 
+
+    if (!(stringStream >> stepIndex)) {
+        throw (string)"Invalid input. The step must be a number.";
+    }
+    	
+    this->step1 = dynamic_cast<NumberInputStep*>(this->getStep(stepIndex));
+
+    if (this->step1 == nullptr) {
+        throw (string)"Invalid input. The step must be a NumberInputStep.";
+    }
 }
 
 void CalculusStep::setStep2()
-{
-    cin>>this->step2;
+{   
+    string input;
+    int stepIndex;
+    getline(cin, input);
+
+    istringstream stringStream(input); 
+
+    if (!(stringStream >> stepIndex)) {
+        throw (string)"Invalid input. The step must be a number.";
+    }
+    	
+    this->step2 = dynamic_cast<NumberInputStep*>(this->getStep(stepIndex));
+
+    if (this->step2 == nullptr) {
+        throw (string)"Invalid input. The step must be a NumberInputStep.";
+    }
 }
 
 void CalculusStep::setContainingFlow(vector<Step*>* _containingFlow)
@@ -183,41 +301,31 @@ void CalculusStep::setContainingFlow(vector<Step*>* _containingFlow)
     this->containingFlow = _containingFlow;
 }
 
-Step* CalculusStep::getStep(int stepNumber)
+Step* CalculusStep::getStep(int stepIndex)
 {
-    return this->containingFlow->at(stepNumber);
+    return this->containingFlow->at(stepIndex);
 }
 
 void CalculusStep::setOpearation()
 {
-    cin>>this->operation;
+    getline(cin, this->operation);
+
+    if (operation != "+" && operation != "-" && operation != "*" &&
+        operation != "/" && operation != "min" && operation != "max") {
+        this->operation = "Unknown";
+        throw string("Invalid input. Please enter +, -, *, /, min, or max.");
+    }
 }
 
 void CalculusStep::calculate()
 {
-    NumberInputStep* s1 = dynamic_cast<NumberInputStep*>(this->getStep(this->step1));
-    NumberInputStep* s2 = dynamic_cast<NumberInputStep*>(this->getStep(this->step2));
-
-    if (this->operation == "+") {
-        this->result = s1->getNumber() + s2->getNumber();
-    }
-    else if (this->operation == "-") {
-        this->result = s1->getNumber() - s2->getNumber();
-    }
-    else if (this->operation == "*") {
-        this->result = s1->getNumber() * s2->getNumber();
-    }
-    else if (this->operation == "/") {
-        this->result = s1->getNumber() / s2->getNumber();
-    }
-    else if (this->operation == "min") {
-        this->result = min(s1->getNumber(), s2->getNumber());
-    }
-    else if (this->operation == "max") {
-        this->result = max(s1->getNumber(), s2->getNumber());
+    auto map = operationMap<float>.find(operation);
+    if (map != operationMap<float>.end()) {
+        this->result = 
+        map->second(this->step1->getNumber(), this->step2->getNumber());
     }
     else {
-        cout<<"ERROR";
+        cerr<<"ERROR";
     }
 }
 
@@ -225,17 +333,37 @@ void CalculusStep::calculate()
 
 DisplayStep::DisplayStep(vector<Step*>* containingFlow)
 {
-    cout<<"Step to display: ";
-    this->setStep();
+    // Default initializations
     this->setContainingFlow(containingFlow);
+    this->step = nullptr;
+
+    while (this->state) {
+        try {
+            if (this->step == nullptr) {
+                cout<<"Step to display: ";
+                this->setStep();
+            }
+            this->state = false;
+        }
+        catch (string error) {
+            cerr<<error<<"\n";
+            cout<<"Do you want to skip this step? [Y/N] ";
+            
+            char answer;
+            cin>>answer;
+            getchar();
+
+            if (answer == 'y' || answer == 'Y') {
+                this->state = false;
+            }
+        }
+    } 
 }
 
 void DisplayStep::run(ostream& output)
 {
-    Step* s1 = this->getStep();
-
-    TextFileStep* textStep = dynamic_cast<TextFileStep*>(s1);
-    CsvFileStep* csvStep = dynamic_cast<CsvFileStep*>(s1);
+    TextFileStep* textStep = dynamic_cast<TextFileStep*>(this->step);
+    CsvFileStep* csvStep = dynamic_cast<CsvFileStep*>(this->step);
 
     string path;
     
@@ -247,12 +375,31 @@ void DisplayStep::run(ostream& output)
     }
 
     FileManager::readAndPrint(path, output);
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void DisplayStep::setStep()
 {
-    cin>>this->step;
-    getchar();
+    string input;
+    int stepIndex;
+    getline(cin, input);
+
+    istringstream stringStream(input); 
+
+    if (!(stringStream >> stepIndex)) {
+        throw (string)"Invalid input. The step must be a number.";
+    }
+    	
+    if (dynamic_cast<TextFileStep*>(this->getStep(stepIndex)) == nullptr &&
+        dynamic_cast<CsvFileStep*>(this->getStep(stepIndex)) == nullptr) {
+        throw (string)"Invalid input. The step must be a TextFileStep or a CsvFileStep.";
+    }
+
+    this->step = this->getStep(stepIndex);
 }
 
 void DisplayStep::setContainingFlow(vector<Step*>* _containingFlow)
@@ -260,15 +407,19 @@ void DisplayStep::setContainingFlow(vector<Step*>* _containingFlow)
     this->containingFlow = _containingFlow;
 }
 
-Step* DisplayStep::getStep()
+Step* DisplayStep::getStep(int stepIdx)
 {
-    return this->containingFlow->at(this->step);
+    return this->containingFlow->at(stepIdx);
 }
 
 //  TEXT FILE STEP
 
 TextFileStep::TextFileStep()
 {
+    // Default initializations
+    this->description = "Unknown";
+    this->fileName = "Unknown";
+
     cout<<"Description: ";
     this->setDescription();
 }
@@ -278,6 +429,11 @@ void TextFileStep::run(ostream& output)
     cout<<this->getDescription()<<"\n\n";
     cout<<"File name: ";
     this->setFileName();
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void TextFileStep::setDescription()
@@ -304,6 +460,10 @@ string TextFileStep::getFileName()
 
 CsvFileStep::CsvFileStep()
 {
+    // Default initializations
+    this->description = "Unknown";
+    this->fileName = "Unknown";
+
     cout<<"Description: ";
     this->setDescription();
 }
@@ -313,6 +473,11 @@ void CsvFileStep::run(ostream& output)
     cout<<this->getDescription()<<"\n\n";
     cout<<"File name: ";
     this->setFileName();
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void CsvFileStep::setDescription()
@@ -339,6 +504,13 @@ string CsvFileStep::getFileName()
 
 OutputStep::OutputStep(vector<Step*>* containingFlow)
 {
+    // Default initializations
+    this->step = nullptr;
+    this->fileName = "Unknown";
+    this->title = "Unknown";
+    this->description = "Unknown";
+    this->setContainingFlow(containingFlow);
+
     cout<<"File name: ";
     this->setFileName();
     cout<<"Title: ";
@@ -347,30 +519,41 @@ OutputStep::OutputStep(vector<Step*>* containingFlow)
     this->setDescription(); 
     cout<<"Step: ";
     this->setStep();
-    this->setContainingFlow(containingFlow);
 }
 
 void OutputStep::run(ostream& output)
 {   
     ofstream fout(this->getFileName(), ios::out);
 
-    Step* step = this->getStep();
-
     fout<<this->getTitle()<<"\n\n";
     fout<<this->getDescription()<<"\n\n";
 
-    fout<<"==========   STEP "<<this->step<<" OUTPUT    ==========\n\n";
+    fout<<"==========   STEP OUTPUT    ==========\n\n";
 
-    step->run(fout);
+    this->step->run(fout);
 
     cout<<"The output file with the name "
         <<this->getFileName()<<" was created\n\n";
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 void OutputStep::setStep()
 {
-    cin>>this->step;
-    getchar();
+    string input;
+    int stepIndex;
+    getline(cin, input);
+
+    istringstream stringStream(input); 
+
+    if (!(stringStream >> stepIndex)) {
+        throw (string)"Invalid input. The step must be a number.";
+    }
+    	
+    this->step = this->getStep(stepIndex);
 }
 
 void OutputStep::setContainingFlow(vector<Step*>* _containingFlow)
@@ -378,9 +561,9 @@ void OutputStep::setContainingFlow(vector<Step*>* _containingFlow)
     this->containingFlow = _containingFlow;
 }
 
-Step *OutputStep::getStep()
+Step *OutputStep::getStep(int stepIndex)
 {
-    return this->containingFlow->at(this->step);
+    return this->containingFlow->at(stepIndex);
 }
 
 void OutputStep::setFileName()
@@ -418,6 +601,11 @@ string OutputStep::getDescription()
 void EndStep::run(ostream& output)
 {
     cout<<"End\n\n";
+
+    cout<<"Press [SPACE] to continue.\n";
+    getchar();
+
+    system("clear");
 }
 
 //  STEP FACTORY

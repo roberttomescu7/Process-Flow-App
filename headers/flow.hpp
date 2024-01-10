@@ -9,6 +9,7 @@ class Flow
         vector<Step*> steps;
     
     public:
+        Flow() {}
         void runFlow();
         void addStep(Step* stepToAdd);
         vector<Step*>* getSteps();
