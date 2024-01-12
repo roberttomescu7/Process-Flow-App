@@ -19,10 +19,6 @@ class Step
 
     public:
         virtual void run(ostream& output) = 0;
-        void skip()
-        {
-            cout<<"Step skiped!";
-        }
 };
 
 class TitleStep : public Step
@@ -33,6 +29,7 @@ class TitleStep : public Step
 
     public: 
         TitleStep();
+        ~TitleStep() = default;
         void run(ostream& output) override;
         void setTitle();
         string getTitle();
@@ -48,6 +45,7 @@ class TextStep : public Step
     
     public:
         TextStep();
+        ~TextStep() = default;
         void run(ostream& output) override;
         void setTitle();
         string getTitle();
@@ -63,6 +61,7 @@ class TextInputStep : public Step
     
     public:
         TextInputStep();
+        ~TextInputStep() = default;
         void run(ostream& output) override;
         void setDescription();
         string getDescription();
@@ -78,6 +77,7 @@ class NumberInputStep : public Step
     
     public:
         NumberInputStep();
+        ~NumberInputStep() = default;
         void run(ostream& output) override;
         void setDescription();
         string getDescription();
@@ -96,6 +96,7 @@ class CalculusStep : public Step
     
     public:
         CalculusStep(vector<Step*>* containingFlow);
+        ~CalculusStep() = default;
         void run(ostream& output) override;
         void setStep1();
         void setStep2();
@@ -113,6 +114,7 @@ class DisplayStep : public Step
     
     public:
         DisplayStep(vector<Step*>* containingFlow);
+        ~DisplayStep() = default;
         void run(ostream& output) override;
         void setStep();
         void setContainingFlow(vector<Step*>* container);
@@ -127,6 +129,7 @@ class TextFileStep : public Step
 
     public:
         TextFileStep();
+        ~TextFileStep() = default;
         void run(ostream& output) override;
         void setDescription();
         string getDescription();
@@ -142,6 +145,7 @@ class CsvFileStep : public Step
 
     public:
         CsvFileStep();
+        ~CsvFileStep() = default;
         void run(ostream& output) override;
         void setDescription();
         string getDescription();
@@ -160,6 +164,7 @@ class OutputStep : public Step
 
     public:
         OutputStep(vector<Step*>* containingFlow);
+        ~OutputStep() = default;
         void run(ostream& output) override;
         void setStep();
         void setContainingFlow(vector<Step*>* container);
@@ -175,6 +180,7 @@ class OutputStep : public Step
 class EndStep : public Step
 {
     public:
+        ~EndStep() = default;
         void run(ostream& output) override;
         // NOTE: More complex functionality can be added later
 };

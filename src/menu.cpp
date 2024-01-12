@@ -33,7 +33,14 @@ Menu::Menu()
             this->createFlowButton();
         }
         else if (answer == '2') {
-            this->runFlowButton();
+            if (this->flows.size() > 0) {
+                this->runFlowButton();
+            }
+            else {
+                cout<<"No flows have been created.\n";
+                cout<<"Press [ENTER] to continue.";
+                getchar();
+            }
         }
 
     system("clear");
@@ -114,6 +121,23 @@ void Menu::createFlowButton()
 void Menu::runFlowButton()
 {
     system("clear");
+    int count = 1;
+    for (Flow* flow : flows) {
+        cout<<count<<".\t"<<flow->getTimestamp()<<"\t"<<flow->getFlowName()<<"\n\n";
+        count++;
+    }
 
-    this->flows[0]->runFlow();
+    string input;
+    int answer = 0;
+
+    while (answer == 0) {
+        cout<<"What flow do you want to run? Your answer: ";
+        getline(cin, input);
+        if (!(istringstream(input) >> answer)) {
+            cout<<"Invalid input. You have to introduce a number.\n";
+        }
+    }  
+
+    system("clear");
+    this->flows[--answer]->runFlow();  
 }

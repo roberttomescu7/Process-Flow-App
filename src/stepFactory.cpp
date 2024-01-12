@@ -270,6 +270,8 @@ void CalculusStep::setStep1()
         throw (string)"Invalid input. The step must be a number.";
     }
     	
+    stepIndex--;
+
     this->step1 = dynamic_cast<NumberInputStep*>(this->getStep(stepIndex));
 
     if (this->step1 == nullptr) {
@@ -288,6 +290,8 @@ void CalculusStep::setStep2()
     if (!(stringStream >> stepIndex)) {
         throw (string)"Invalid input. The step must be a number.";
     }
+
+    stepIndex--;
     	
     this->step2 = dynamic_cast<NumberInputStep*>(this->getStep(stepIndex));
 
@@ -393,6 +397,8 @@ void DisplayStep::setStep()
     if (!(stringStream >> stepIndex)) {
         throw (string)"Invalid input. The step must be a number.";
     }
+
+    stepIndex--;
     	
     if (dynamic_cast<TextFileStep*>(this->getStep(stepIndex)) == nullptr &&
         dynamic_cast<CsvFileStep*>(this->getStep(stepIndex)) == nullptr) {
@@ -552,6 +558,8 @@ void OutputStep::setStep()
     if (!(stringStream >> stepIndex)) {
         throw (string)"Invalid input. The step must be a number.";
     }
+
+    stepIndex--;
     	
     this->step = this->getStep(stepIndex);
 }
