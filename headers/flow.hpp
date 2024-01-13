@@ -4,6 +4,7 @@
 #include <chrono>
 #include <ctime>
 #include "stepFactory.hpp"
+#include "analyticModule.hpp"
 
 class Flow
 {
@@ -11,6 +12,7 @@ class Flow
         vector<Step*> steps;
         string flowName;
         chrono::time_point<chrono::system_clock> timestamp;
+        Analyzer analyzer;
     
     public:
         Flow();
@@ -21,6 +23,8 @@ class Flow
         void setFlowName();
         string getFlowName();
         string getTimestamp();
+        Analyzer* getAnalyzer();
+        Observer* getObserver();
 };
 
 #endif

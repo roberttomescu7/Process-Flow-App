@@ -20,7 +20,7 @@ class FileManager
             if (extension == "txt") {
                 string line;
                 while (getline(fin, line)) {
-                    cout << line << "\n";
+                    output << line << "\n";
                 }
             }   
             else if (extension == "csv") {

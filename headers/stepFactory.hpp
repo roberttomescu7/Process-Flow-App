@@ -9,16 +9,27 @@
 #include <functional>
 #include <stdlib.h>
 #include "fileManager.hpp"
+#include "observer.hpp"
 
 using namespace std;
 
-class Step
+class Step : public Subject
 {
     protected:
         bool state = true;
+        int errorsCount = 0;
+        int skips = 0;
 
     public:
         virtual void run(ostream& output) = 0;
+        void attach(Observer* _observer) override
+        {
+            this->observer = _observer;
+        }
+        void notify(string stepName, int errors, int skips) override
+        {
+            this->observer->update(stepName, errors, skips);
+        }
 };
 
 class TitleStep : public Step

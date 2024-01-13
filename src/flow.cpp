@@ -48,3 +48,13 @@ string Flow::getTimestamp()
     auto time = std::chrono::system_clock::to_time_t(timestamp);
     return std::ctime(&time);
 }
+
+Observer* Flow::getObserver()
+{
+    return &this->analyzer;
+}
+
+Analyzer* Flow::getAnalyzer()
+{
+    return &this->analyzer;
+}

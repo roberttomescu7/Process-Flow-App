@@ -21,6 +21,7 @@ void TitleStep::run(ostream& output)
 
     cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Title step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -61,11 +62,12 @@ TextStep::TextStep()
 
 void TextStep::run(ostream& output)
 {
-    cout<<this->getTitle()<<"\n\n";
-    cout<<this->getCopy()<<"\n\n";
+    output<<this->getTitle()<<"\n\n";
+    output<<this->getCopy()<<"\n\n";
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Text step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -104,13 +106,14 @@ TextInputStep::TextInputStep()
 
 void TextInputStep::run(ostream& output)
 {
-    cout<<this->getDescription()<<"\n\n";
-    cout<<"Text: ";
+    output<<this->getDescription()<<"\n\n";
+    output<<"Text: ";
     this->setText();
-    cout<<"\n\n";
+    output<<"\n\n";
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Text input step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -150,6 +153,8 @@ NumberInputStep::NumberInputStep()
 
 void NumberInputStep::run(ostream& output)
 {
+    this->state = true;
+
     while (this->state) {
         try {
             cout<<this->description<<"\n\n";
@@ -159,6 +164,7 @@ void NumberInputStep::run(ostream& output)
             this->state = false;
         }
         catch (string error) {
+            this->errorsCount++;
             cerr<<error<<"\n";
             cout<<"Do you want to skip this step? [Y/N] ";
             
@@ -168,12 +174,14 @@ void NumberInputStep::run(ostream& output)
 
             if (answer == 'y' || answer == 'Y') {
                 this->state = false;
+                this->skips++;
             }
         }
     }
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Number input step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -212,6 +220,7 @@ CalculusStep::CalculusStep(vector<Step*>* containingFlow)
     this->step2 = nullptr;
     this->operation = "Unknown";
     this->result = 0;
+    this->state = true;
 
     while (this->state) {
         try {
@@ -246,14 +255,15 @@ CalculusStep::CalculusStep(vector<Step*>* containingFlow)
 
 void CalculusStep::run(ostream& output)
 {
-    cout<<"Result: ";
+    output<<"Result: ";
 
     this->calculate();
 
-    cout<<this->result<<"\n\n";
+    output<<this->result<<"\n\n";
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Calculus step", this->errorsCount, this->skips);
 
     system("clear");
 }   
@@ -380,8 +390,9 @@ void DisplayStep::run(ostream& output)
 
     FileManager::readAndPrint(path, output);
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Display step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -436,8 +447,9 @@ void TextFileStep::run(ostream& output)
     cout<<"File name: ";
     this->setFileName();
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Text file step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -480,8 +492,9 @@ void CsvFileStep::run(ostream& output)
     cout<<"File name: ";
     this->setFileName();
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Csv file step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -541,8 +554,9 @@ void OutputStep::run(ostream& output)
     cout<<"The output file with the name "
         <<this->getFileName()<<" was created\n\n";
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
+    this->notify("Output step", this->errorsCount, this->skips);
 
     system("clear");
 }
@@ -610,7 +624,7 @@ void EndStep::run(ostream& output)
 {
     cout<<"End\n\n";
 
-    cout<<"Press [SPACE] to continue.\n";
+    cout<<"Press [ENTER] to continue.\n";
     getchar();
 
     system("clear");

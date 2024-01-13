@@ -1,18 +1,5 @@
 #include "../headers/menu.hpp"
 
-enum StepType {
-    TITLE_STEP = 1,
-    TEXT_STEP = 2,
-    TEXT_INPUT_STEP = 3,
-    NUMBER_INPUT_STEP = 4,
-    CALCULUS_STEP = 5,
-    DISPLAY_STEP = 6,
-    TEXT_FILE_STEP = 7,
-    CSV_FILE_STEP = 8,
-    OUTPUT_STEP = 9,
-    END_STEP = 10
-};
-
 Menu::Menu()
 {
     system("clear");
@@ -23,7 +10,8 @@ Menu::Menu()
         cout<<"What do you want to do?\n\n"
             <<"1. Create a flow\n"
             <<"2. Run a flow\n"
-            <<"3. Exit\n";
+            <<"3. Analyzes\n"
+            <<"4. Exit\n";
 
         cout<<"Your answer: ";
         cin>>answer;
@@ -42,10 +30,13 @@ Menu::Menu()
                 getchar();
             }
         }
+        else if (answer == '3') {
+            this->analyzesButton();
+        }
 
     system("clear");
 
-    } while (answer != '3'); 
+    } while (answer != '4'); 
 }
 
 void Menu::createFlowButton()
@@ -111,6 +102,7 @@ void Menu::createFlowButton()
         }   
 
         if (tmpStep) {
+            tmpStep->attach(tmpFlow->getObserver());
             tmpFlow->addStep(tmpStep);
         }
     } while (dynamic_cast<EndStep*>(tmpFlow->getSteps()->back()) == nullptr);
@@ -139,5 +131,34 @@ void Menu::runFlowButton()
     }  
 
     system("clear");
-    this->flows[--answer]->runFlow();  
+    this->flows[--answer]->getAnalyzer()->update(CLEAR);
+    this->flows[answer]->getAnalyzer()->update(FLOW_STARTED_FLAG);
+    this->flows[answer]->runFlow();
+    this->flows[answer]->getAnalyzer()->update(FLOW_COMPLETED_FLAG);
 }
+
+void Menu::analyzesButton()
+{
+    system("clear");
+    int count = 1;
+    for (Flow* flow : flows) {
+        cout<<count<<".\t"<<flow->getTimestamp()<<"\t"<<flow->getFlowName()<<"\n\n";
+        count++;
+    }
+
+    string input;
+    int answer = 0;
+
+    while (answer == 0) {
+        cout<<"What flow do you want to analyze? Your answer: ";
+        getline(cin, input);
+        if (!(istringstream(input) >> answer)) {
+            cout<<"Invalid input. You have to introduce a number.\n";
+        }
+    }  
+
+    system("clear");
+
+    this->flows[--answer]->getAnalyzer()->display();
+}
+
