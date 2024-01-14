@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include "observer.hpp"
 
 using namespace std;

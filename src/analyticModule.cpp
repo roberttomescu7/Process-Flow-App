@@ -32,12 +32,15 @@ void Analyzer::display()
 {
     cout<<"This flow has been started "<<this->flowStartedCount<<" times.\n";
     cout<<"This flow has been copleted "<<this->flowCompletedCount<<" times.\n\n";
-    cout<<"SCREEN\t\t\tSkips count\tErrors count\n";
 
-    for (int i = 0; i < this->screens.size(); i++) {
-        cout<<this->screens[i]<<"\t\t"
-            <<this->skippedCount[i]<<"\t"
-            <<this->errorCount[i]<<"\n";
+    cout<<left<<setw(30)<<"SCREEN"
+        << std::setw(15)<<"SKIPS"
+        << std::setw(15)<<"ERRORS" << "\n";
+
+    for (int i = 0; i < screens.size(); i++) {
+        cout<<left<<setw(30)<<screens[i]
+            <<setw(15)<<skippedCount[i]
+            <<setw(15)<<errorCount[i] << "\n";
     }
 
     cout<<"\n\nPress [ENTER] to continue.";
